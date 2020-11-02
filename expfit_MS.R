@@ -149,63 +149,63 @@ expfit_MS = function (d, start_par, rob_method= "lad", typ, constraint, shared_p
     
     ##### LAD (or LORENTZ) robust fit with New initial parameters == fitted parameters from ordinary fit ################     
     new_par= coef(model_ord)
-                    # 
-                    # if (rob_method=="lad") {
-                    #   res_rob= function(true_value, par, t) {
-                    #     (sqrt(abs(true_value - f(par, t))))
-                    #   } 
-                    # } else if (rob_method=="lorentz") {
-                    #   P.68= 68.27
-                    #   K= length(new_par)
-                    #   N= length(data[,"y"])
-                    #   RSDR= P.68*(N)/(N-K)
-                    #   res_rob= function(true_value, par, t) {
-                    #     D= true_value - f(par, t)
-                    #     tmp= log (1+ (D/RSDR)^2)
-                    #     sqrt(tmp)
-                    #   }
-                    # }
-                    # model_rob= nls.lm(par = new_par, 
-                    #                   fn = res_rob, 
-                    #                   lower = lower, 
-                    #                   upper = upper,
-                    #                   true_value= data[,"y"],
-                    #                   t= data[ , "t"],
-                    #                   control = nls.lm.control(nprint=-1, 
-                    #                                            maxiter = 500, 
-                    #                                            ftol = 1e-25, 
-                    #                                            ptol = 1e-25, 
-                    #                                            gtol = 1e-25)
-                    # )
-                    # 
-                        ##### get outlier from robust approach ########
-                        # res= resid(model_rob)
-                        # std_rob= sqrt(var(res))
-                        # m= mean(res)
-                        # thr1= m - 1.96* std_rob
-                        # thr2= m + 1.96*std_rob
-                        # 
-                        # if ((thr2-thr1) > 0) {
-                        #   indx= which(res<thr1 | res > thr2)
-                        #   
-                        #   if (length(indx) == 0) 
-                        #   {
-                        #     new_data=data
-                        #     std_new= std_rob
-                        #     indx_l[[i]]= integer(0)
-                        #   }else {
-                        #     new_data= data.frame(y= data[,"y"][-c(indx)], t= data[,"t"][-c(indx)])
-                        #     std_new= std_rob[-indx]
-                        #     indx_l[[i]]= c(indx)
-                        #   }
-                        #   indx_l[[i]]= c(indx)
-                        #   rm(indx)
-                        # } else {
-                        #   new_data= data
-                        #   indx_l[[i]]= NULL
-                        # }
+
+    if (rob_method=="lad") {
+      res_rob= function(true_value, par, t) {
+        (sqrt(abs(true_value - f(par, t))))
+      } 
+    } else if (rob_method=="lorentz") {
+      P.68= 68.27
+      K= length(new_par)
+      N= length(data[,"y"])
+      RSDR= P.68*(N)/(N-K)
+      res_rob= function(true_value, par, t) {
+        D= true_value - f(par, t)
+        tmp= log (1+ (D/RSDR)^2)
+        sqrt(tmp)
+      }
+    }
+    model_rob= nls.lm(par = new_par, 
+                      fn = res_rob, 
+                      lower = lower, 
+                      upper = upper,
+                      true_value= data[,"y"],
+                      t= data[ , "t"],
+                      control = nls.lm.control(nprint=-1, 
+                                               maxiter = 500, 
+                                               ftol = 1e-25, 
+                                               ptol = 1e-25, 
+                                               gtol = 1e-25)
+    )
+
+        #### get outlier from robust approach ########
+        res= resid(model_rob)
+        std_rob= sqrt(var(res))
+        m= mean(res)
+        thr1= m - 1.96* std_rob
+        thr2= m + 1.96*std_rob
+
+        if ((thr2-thr1) > 0) {
+          indx= which(res<thr1 | res > thr2)
+
+          if (length(indx) == 0) 
+          {
+            new_data=data
+            std_new= std_rob
+            indx_l[[i]]= integer(0)
+          }else {
+            new_data= data.frame(y= data[,"y"][-c(indx)], t= data[,"t"][-c(indx)])
+            std_new= std_rob[-indx]
+            indx_l[[i]]= c(indx)
+          }
+          indx_l[[i]]= c(indx)
+          rm(indx)
+        } else {
+          new_data= data
+          indx_l[[i]]= NULL
+        }
     ########################
-    new_data= data
+#     new_data= data
     #########################
     
     
