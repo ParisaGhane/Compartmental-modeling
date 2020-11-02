@@ -1,24 +1,16 @@
 graphics.off()
 rm(list=ls())
 setwd("T:/Pghane/Compartmental_Analysis")
-#install.packages("readxl")
-# install.packages("minpack.lm")
+install.packages("readxl")
+install.packages("minpack.lm")
 library(readxl)
 library(minpack.lm)
 #library(robustbase)
 
-source("T:/Pghane/Categorical_Analysis/functions/Fix_Merge_rightSub.R")
-#source("functions/getoutlier .R")
-#source("functions/fit_exp_Alvise.R")
-#source("functions/fit_exp.R")
-#source("functions/myplot.R")
-#source("functions/residuals.R")
-
-#source("functions/initial_value.R")
+# source("T:/Pghane/Categorical_Analysis/functions/Fix_Merge_rightSub.R")
+source("functions/getoutlier.R")
 source("functions/initial_value_constrained.R")
-source("functions/bigD_fit.R")
 source("functions/expfit_MS.R")
-source("functions/shared_vals.R")
 
 #import data ##### 
 #PHE6
