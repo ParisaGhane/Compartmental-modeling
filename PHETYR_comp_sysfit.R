@@ -12,7 +12,9 @@ source("functions/getoutlier.R")
 source("functions/initial_value_constrained.R")
 source("functions/expfit_MS.R")
 
-#import data ##### 
+##############################
+##### importing the data ##### 
+##############################
 #PHE6
 PHE6 = read_excel("data/15-OCERA -SUM-Pulse-TTR.xlsx",
                   sheet = "PHE6",
@@ -55,7 +57,12 @@ TYR6.m= data.matrix(TYR6[-c(1,2), ])
 TYR6data= as.data.frame(TYR6.m)
 rm(subject_day, TYR6.m)
 
-##fit on PHE6 and TYR4
+##############################
+# A preliminary fit on PHE6 and TYR4 
+##############################
+# This is done to detect and remove the outliers 
+# and estimate the initial parameter values
+
 f_2exp= function(pars2, t){
   expr = expression(pars2["P1"]* exp(-pars2["p1"]*t)+
                       pars2["P2"]*exp(-pars2["p2"]*t)#+
@@ -76,8 +83,13 @@ tyr4_fit= expfit_MS(d = TYR4data, start_par = tyr4_initial,
                     rob_method = "lorentz", typ = typ, 
                     constraint = T, shared_pars = NULL)
 
-# preprocess #####
-subjectid= c(rep(colnames(PHE6data)[-1], each= nrow(PHE6data)-1),   # for phe6 and tyr4 remove t0, for tyr6 keep all points 
+##############################
+##### Model's data and indicators 
+##############################
+# Creating the model's data and the TTR-dataset indicators. 
+# model's data results from concatenation of TTR-data-sets. 
+# for phe6 and tyr4 remove t0, for tyr6 keep all points.
+subjectid= c(rep(colnames(PHE6data)[-1], each= nrow(PHE6data)-1),    
              rep(colnames(TYR4data)[-1], each= nrow(TYR4data)-1),
              rep(colnames(TYR6data)[-1], each= nrow(TYR6data)))  
 
@@ -129,6 +141,9 @@ dlist= apply (sublev_mat, MARGIN = 1, function(lev)
 })
 names(dlist)= sublev
 
+##############################
+# Defining model's functions (equations 3 in the manuscript) 
+##############################
 phe6expr= expression( pars["A"]*exp(-pars["lambda1"]*t) + pars["B"]*exp(-pars["lambda2"]*t))
 tyr4expr= expression( pars["C"]*exp(-pars["lambda3"]*t) + pars["D"]*exp(-pars["lambda4"]*t))
 tyr6expr= expression ( pars["k31"]*(
@@ -143,6 +158,10 @@ tyr6expr= expression ( pars["k31"]*(
 )
 )
 
+##############################
+# Defining model's function and initial parameters' values
+  # for the simultaneous fit on the equations 3 of the manuscript
+##############################
 f_phetyr= function (dd, pars, t) {
   dd$is.phe6 * eval(phe6expr) + dd$is.tyr4 * eval(tyr4expr) + dd$is.tyr6 * eval(tyr6expr)
 } 
@@ -162,13 +181,18 @@ for (i in 1:length(model_initial)) {
   D= tyr4_fit$all.f_2[[i+1]]$par[["P2"]]
   lambda4= tyr4_fit$all.f_2[[i+1]]$par[["p2"]]
   
-  k31= 0.005 
+  k31= 0.005  # equivalent to the k_phe-->tyr
+              # approximated from a non-compartmental approach 
+              # could also be a random initial value between 0 and 1 
   
   model_initial[[i]]= c(A= A, lambda1= lambda1, B= B, lambda2= lambda2,
                         C= C, lambda3= lambda3, D= D, lambda4= lambda4, 
                         k31= k31)
 } 
 
+##############################
+# fitting the model's function on the model's data per subject
+##############################
 for (ii in 1:length(dlist)) {
   dd= dlist[[ii]]
   print(dd[1,1])
@@ -184,6 +208,7 @@ for (ii in 1:length(dlist)) {
   indx= which(!is.na(dd[,"isotope"]))  
   dnna= dd[indx,]
   
+  # defining the model's residuals for a non-linear least square regression
   res_ord= function(true_value, pars, t) {
     (true_value - f_phetyr(dnna, pars, t)) / diff(range(true_value))
   }
@@ -204,6 +229,7 @@ for (ii in 1:length(dlist)) {
   indx_tyr4= dd[,"is.tyr4"]==1
   indx_tyr6= dd[,"is.tyr6"]==1
   
+ # plotting fits per subject 
   par(mfrow=c(3,1))
   plot(dd[indx_phe6,"sampletruetime"], dd[indx_phe6,"isotope"],
        xlab= "Time(min)", ylab = "phe6")
@@ -223,8 +249,6 @@ for (ii in 1:length(dlist)) {
   lines(dd[indx_tyr6,"sampletruetime"], 
         f_phetyr(dd[indx_tyr6, ], pars = model_ord$par, t = dd[indx_tyr6,"sampletruetime"]), 
         col="red")
-  
-  
 }
 
 
