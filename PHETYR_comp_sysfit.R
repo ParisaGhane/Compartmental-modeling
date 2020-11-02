@@ -12,9 +12,9 @@ source("functions/getoutlier.R")
 source("functions/initial_value_constrained.R")
 source("functions/expfit_MS.R")
 
-##############################
-##### importing the data ##### 
-##############################
+##################################################
+##### importing the data 
+##################################################
 #PHE6
 PHE6 = read_excel("data/15-OCERA -SUM-Pulse-TTR.xlsx",
                   sheet = "PHE6",
@@ -57,9 +57,9 @@ TYR6.m= data.matrix(TYR6[-c(1,2), ])
 TYR6data= as.data.frame(TYR6.m)
 rm(subject_day, TYR6.m)
 
-##############################
+##################################################
 # A preliminary fit on PHE6 and TYR4 
-##############################
+##################################################
 # This is done to detect and remove the outliers 
 # and estimate the initial parameter values
 
@@ -83,9 +83,9 @@ tyr4_fit= expfit_MS(d = TYR4data, start_par = tyr4_initial,
                     rob_method = "lorentz", typ = typ, 
                     constraint = T, shared_pars = NULL)
 
-##############################
+##################################################
 ##### Model's data and indicators 
-##############################
+##################################################
 # Creating the model's data and the TTR-dataset indicators. 
 # model's data results from concatenation of TTR-data-sets. 
 # for phe6 and tyr4 remove t0, for tyr6 keep all points.
@@ -132,7 +132,7 @@ dfac= as.factor(subjectid)
 sublev= levels(dfac)
 sublev_mat= as.matrix(sublev, ncol= 1)   # create one column containing  unique(subjectids)
 
-###store data in a list where each element is a dataframe for one subject ################
+# store data in a list where each element is a dataframe for one subject 
 dlist= apply (sublev_mat, MARGIN = 1, function(lev)
 {
   indx= which(ddf[,"subjectid"] == lev)
@@ -141,9 +141,9 @@ dlist= apply (sublev_mat, MARGIN = 1, function(lev)
 })
 names(dlist)= sublev
 
-##############################
+##################################################
 # Defining model's functions (equations 3 in the manuscript) 
-##############################
+##################################################
 phe6expr= expression( pars["A"]*exp(-pars["lambda1"]*t) + pars["B"]*exp(-pars["lambda2"]*t))
 tyr4expr= expression( pars["C"]*exp(-pars["lambda3"]*t) + pars["D"]*exp(-pars["lambda4"]*t))
 tyr6expr= expression ( pars["k31"]*(
@@ -158,10 +158,10 @@ tyr6expr= expression ( pars["k31"]*(
 )
 )
 
-##############################
+##################################################
 # Defining model's function and initial parameters' values
   # for the simultaneous fit on the equations 3 of the manuscript
-##############################
+##################################################
 f_phetyr= function (dd, pars, t) {
   dd$is.phe6 * eval(phe6expr) + dd$is.tyr4 * eval(tyr4expr) + dd$is.tyr6 * eval(tyr6expr)
 } 
