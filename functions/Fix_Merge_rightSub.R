@@ -1,17 +1,15 @@
-# Here are 3 functions: mydataFix, MyExcelMerge, and rightSub
+# MydataFix Finds and Removes
+            # COLUMNAMES==0 or NA
+            # DUPLICATED COLUMNS 
+            # ROWS WITH ALL NA VALUES
 
-        # MydataFix Finds and Removes
-                    # COLUMNAMES==0 or NA
-                    # DUPLICATED COLUMNS 
-                    # ROWS WITH ALL NA VALUES
+# MyExcelMerge
+            # takes the name for excel file and spreadsheets 
+            # Returns all spreadsheets merged
 
-        # MyExcelMerge
-                    # takes the name for excel file and spreadsheets 
-                    # Returns all spreadsheets merged
-
-        # rightSub
-                  # takes all data
-                  # returns the data for subjects starting with the character specified in starting_char
+# rightSub
+          # takes all data
+          # returns the data for subjects starting with the character specified in starting_char
 
 
 
