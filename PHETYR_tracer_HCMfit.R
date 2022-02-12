@@ -4,7 +4,6 @@ install.packages("readxl")
 install.packages("minpack.lm")
 library(readxl)
 library(minpack.lm)
-#library(robustbase)
 
 source("functions/getoutlier.R")
 source("functions/initial_value_constrained.R")
@@ -41,7 +40,6 @@ TYR4.m= data.matrix(TYR4[-c(1,2), ])
 #rm(subject_day)
 TYR4data= as.data.frame(TYR4.m)
 rm(subject_day, TYR4.m)
-
 
 #TYR6
 TYR6 = read_excel("data/15-OCERA -SUM-Pulse-TTR.xlsx",
@@ -122,8 +120,6 @@ ddf=data.frame( subjectid= subjectid,
                 is.tyr4= is.tyr4,
                 is.tyr6= is.tyr6)
 
-#ddf= as.data.frame(cbind(subjectid, sampletruetime, ttrphe6, ttrtyr4, ttrtyr6))
-
 dfac= as.factor(subjectid)
 sublev= levels(dfac)
 sublev_mat= as.matrix(sublev, ncol= 1)   # create one column containing  unique(subjectids)
@@ -133,7 +129,6 @@ dlist= apply (sublev_mat, MARGIN = 1, function(lev)
 {
   indx= which(ddf[,"subjectid"] == lev)
   ddf[indx, ]
-  #cbind(time, tmp)
 })
 names(dlist)= sublev
 
@@ -193,14 +188,6 @@ for (ii in 1:length(dlist)) {
   dd= dlist[[ii]]
   print(dd[1,1])
   
-  # remove cols with all NA values
-  # indx= apply(dd, 2, function(i) all(is.na(i)))
-  # if (length(indx) > 0) {
-  #   dnna= dd[,!indx]
-  # } else {
-  #   dnna= dd
-  # }
-  
   indx= which(!is.na(dd[,"isotope"]))  
   dnna= dd[indx,]
   
@@ -246,7 +233,3 @@ for (ii in 1:length(dlist)) {
         f_phetyr(dd[indx_tyr6, ], pars = model_ord$par, t = dd[indx_tyr6,"sampletruetime"]), 
         col="red")
 }
-
-
-
-
