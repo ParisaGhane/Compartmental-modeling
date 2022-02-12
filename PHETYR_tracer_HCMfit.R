@@ -1,13 +1,11 @@
 graphics.off()
 rm(list=ls())
-setwd("T:/Pghane/Compartmental_Analysis")
 install.packages("readxl")
 install.packages("minpack.lm")
 library(readxl)
 library(minpack.lm)
 #library(robustbase)
 
-# source("T:/Pghane/Categorical_Analysis/functions/Fix_Merge_rightSub.R")
 source("functions/getoutlier.R")
 source("functions/initial_value_constrained.R")
 source("functions/expfit_MS.R")
@@ -60,8 +58,8 @@ rm(subject_day, TYR6.m)
 ##################################################
 # A preliminary fit on PHE6 and TYR4 
 ##################################################
-# This is done to detect and remove the outliers 
-# and estimate the initial parameter values
+# This part detects and removes the outliers, and 
+#  estimates the initial parameter values
 
 f_2exp= function(pars2, t){
   expr = expression(pars2["P1"]* exp(-pars2["p1"]*t)+
@@ -86,9 +84,7 @@ tyr4_fit= expfit_MS(d = TYR4data, start_par = tyr4_initial,
 ##################################################
 ##### Model's data and indicators 
 ##################################################
-# Creating the model's data and the TTR-dataset indicators. 
-# model's data results from concatenation of TTR-data-sets. 
-# for phe6 and tyr4 remove t0, for tyr6 keep all points.
+# This part creates the data for HCM model along with indicators.
 subjectid= c(rep(colnames(PHE6data)[-1], each= nrow(PHE6data)-1),    
              rep(colnames(TYR4data)[-1], each= nrow(TYR4data)-1),
              rep(colnames(TYR6data)[-1], each= nrow(TYR6data)))  
